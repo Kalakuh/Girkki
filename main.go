@@ -16,8 +16,7 @@ const LOG_PATH string = "girkki.log"
 func main() {
 	conn, dialErr := net.Dial("tcp", SERVER)
 	if dialErr != nil {
-		fmt.Println(dialErr)
-		return
+		panic(dialErr)
 	}
 
 	client := Client{
@@ -41,8 +40,7 @@ func main() {
 			result = result[:len(result) - 1]
 		}
 		if err != nil {
-			fmt.Printf("Error: %v\n", err)
-			return
+			panic(err)
 		}
 		fmt.Printf("<- %v\n", result)
 		if result[:4] == "PING" {
