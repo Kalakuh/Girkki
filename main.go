@@ -2,7 +2,6 @@ package main
 
 const NICK string = "Quha"
 const SERVER string = "chat.freenode.net:8000"
-
 const LOG_PATH string = "girkki.log" 
 
 func main() {
@@ -17,6 +16,10 @@ func main() {
 		&logger,
 	}
 
-	client.Connect(SERVER)
-	client.Run()
+	go func() {
+		client.Connect(SERVER)
+		client.Run()
+	}()
+
+	for {}
 }

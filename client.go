@@ -29,7 +29,6 @@ func analyzeCommand(client *Client, cmd string) {
 		split := strings.Split(cmd, " ")
 		target := split[0]
 		msg := cmd[len(target) + 1:]
-		fmt.Printf("DEBUG: %s ~ %s\n", target, msg)
 		client.Privmsg(target, msg)
 	}
 }
