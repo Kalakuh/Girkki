@@ -19,6 +19,14 @@ func send(conn net.Conn, msg string) {
 	fmt.Printf("-> %v\n", msg)
 }
 
+func (cli *Client) Connect(network string) {
+	var err error
+	cli.conn, err = net.Dial("tcp", SERVER)
+	if err != nil {
+		panic(err)
+	}
+}
+
 func (cli *Client) ChangeNick(nick string) { // TODO: add error handling for unavailable nicks
 	cli.nick = nick
 	send(cli.conn, "NICK " + nick)
@@ -30,6 +38,14 @@ func (cli *Client) Auth(text string) {
 
 func (cli *Client) Pong(target string) {
 	send(cli.conn, "PONG " + target)
+}
+
+func (cli *Client) Join(channel string) {
+	send(cli.conn, "JOIN " + channel)
+}
+
+func (cli *Client) Privmsg(channel string, msg string) {
+	send(cli.conn, "PRIVMSG " + channel + " " + msg)
 }
 
 func (cli *Client) Run() {
@@ -45,7 +61,6 @@ func (cli *Client) Run() {
 		fmt.Printf("<- %v\n", result)
 		if result[:4] == "PING" {
 			cli.Pong(result[5:])
-			//send(conn, "PONG " + result[5:len(result) - 1])
 		} else {
 			spl := strings.Split(result, " ")
 			command := spl[1]
