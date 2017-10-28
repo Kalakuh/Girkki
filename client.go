@@ -19,12 +19,27 @@ func send(conn net.Conn, msg string) {
 	fmt.Printf("-> %v\n", msg)
 }
 
+func analyzeCommand(client *Client, cmd string) {
+	if strings.Index(cmd, "!join") == 0 {
+		client.Join(cmd[6:])
+	} else if strings.Index(cmd, "!msg") == 0 {
+		cmd := cmd[5:]
+		split := strings.Split(cmd, " ")
+		target := split[0]
+		msg := cmd[len(target) + 1:]
+		fmt.Printf("DEBUG: %s ~ %s\n", target, msg)
+		client.Privmsg(target, msg)
+	}
+}
+
 func (cli *Client) Connect(network string) {
 	var err error
 	cli.conn, err = net.Dial("tcp", SERVER)
 	if err != nil {
 		panic(err)
 	}
+	cli.ChangeNick(NICK)
+	cli.Auth(NICK + " 8 * :Kuha")
 }
 
 func (cli *Client) ChangeNick(nick string) { // TODO: add error handling for unavailable nicks
@@ -45,7 +60,7 @@ func (cli *Client) Join(channel string) {
 }
 
 func (cli *Client) Privmsg(channel string, msg string) {
-	send(cli.conn, "PRIVMSG " + channel + " " + msg)
+	send(cli.conn, "PRIVMSG " + channel + " :" + msg)
 }
 
 func (cli *Client) Run() {
@@ -72,6 +87,7 @@ func (cli *Client) Run() {
 				if indexOfColon != -1 {
 					msg := result[indexOfColon + 2:]
 					cli.logger.Log(receiver + " " + nick + " " + msg)
+					analyzeCommand(cli, msg)
 				}
 			}
 		}

@@ -18,7 +18,5 @@ func main() {
 	}
 
 	client.Connect(SERVER)
-	client.ChangeNick(NICK)
-	client.Auth(NICK + " 8 * :Kuha")
 	client.Run()
 }
