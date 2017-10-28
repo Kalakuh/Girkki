@@ -13,11 +13,6 @@ const CHANNEL string = "#datatahti"
 
 const LOG_PATH string = "girkki.log" 
 
-func send(conn net.Conn, msg string) {
-	fmt.Fprintf(conn, msg + "\r\n")
-	fmt.Printf("-> %v\n", msg)
-}
-
 func main() {
 	conn, dialErr := net.Dial("tcp", SERVER)
 	if dialErr != nil {
@@ -25,11 +20,19 @@ func main() {
 		return
 	}
 
+	client := Client{
+		NICK,
+		[]string{CHANNEL},
+		conn,
+	}
+
 	var logger Logger
 	logger.Open(LOG_PATH)
 	defer logger.Close()
 
-	send(conn, "NICK " + NICK)
+	
+	//send(conn, "NICK " + NICK)
+	client.ChangeNick(NICK)
 	send(conn, "USER " + NICK + " 8 * :Kuha")
 	reader := bufio.NewReader(conn)
 	for {
@@ -41,9 +44,10 @@ func main() {
 			fmt.Printf("Error: %v\n", err)
 			return
 		}
-		fmt.Printf("<- %v", result)
+		fmt.Printf("<- %v\n", result)
 		if result[:4] == "PING" {
-			send(conn, "PONG " + result[5:len(result) - 1])
+			client.Pong(result[5:])
+			//send(conn, "PONG " + result[5:len(result) - 1])
 		} else {
 			spl := strings.Split(result, " ")
 			command := spl[1]
