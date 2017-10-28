@@ -22,6 +22,8 @@ func send(conn net.Conn, msg string) {
 func analyzeCommand(client *Client, cmd string) {
 	if strings.Index(cmd, "!join") == 0 {
 		client.Join(cmd[6:])
+	} else if strings.Index(cmd, "!nick") == 0 {
+		client.ChangeNick(cmd[6:])
 	} else if strings.Index(cmd, "!msg") == 0 {
 		cmd := cmd[5:]
 		split := strings.Split(cmd, " ")

@@ -1,6 +1,6 @@
 package main
 
-const NICK string = "quha"
+const NICK string = "Quha"
 const SERVER string = "chat.freenode.net:8000"
 
 const LOG_PATH string = "girkki.log" 
