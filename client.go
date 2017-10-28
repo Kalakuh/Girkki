@@ -12,6 +12,7 @@ type Client struct {
 	channels []string
 	conn net.Conn
 	logger *Logger
+	exit bool
 }
 
 func send(conn net.Conn, msg string) {
@@ -21,15 +22,25 @@ func send(conn net.Conn, msg string) {
 
 func analyzeCommand(client *Client, cmd string) {
 	if strings.Index(cmd, "!join") == 0 {
-		client.Join(cmd[6:])
+		if len(cmd) > 5 {
+			client.Join(cmd[6:])
+		}
 	} else if strings.Index(cmd, "!nick") == 0 {
-		client.ChangeNick(cmd[6:])
+		if len(cmd) > 5 {
+			client.ChangeNick(cmd[6:])
+		}
 	} else if strings.Index(cmd, "!msg") == 0 {
+		if len(cmd) > 4 {
 		cmd := cmd[5:]
-		split := strings.Split(cmd, " ")
-		target := split[0]
-		msg := cmd[len(target) + 1:]
-		client.Privmsg(target, msg)
+			split := strings.Split(cmd, " ")
+			if len(split) > 1 {
+				target := split[0]
+				msg := cmd[len(target) + 1:]
+				client.Privmsg(target, msg)
+			}
+		}
+	} else if strings.Index(cmd, "!exit") == 0 {
+		client.Exit()
 	}
 }
 
@@ -64,15 +75,20 @@ func (cli *Client) Privmsg(channel string, msg string) {
 	send(cli.conn, "PRIVMSG " + channel + " :" + msg)
 }
 
+func (cli *Client) Exit() {
+	cli.exit = true
+}
+
 func (cli *Client) Run() {
 	reader := bufio.NewReader(cli.conn)
-	for {
+	for !cli.exit {
 		result, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Printf("Error happened, closing client")
+			return
+		}
 		for result[len(result) - 1] == '\r' || result[len(result) - 1] == '\n' {
 			result = result[:len(result) - 1]
-		}
-		if err != nil {
-			panic(err)
 		}
 		fmt.Printf("<- %v\n", result)
 		if result[:4] == "PING" {
