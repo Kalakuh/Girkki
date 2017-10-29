@@ -1,11 +1,15 @@
 package main
 
 import "sync"
-import "fmt"
 
 const NICK string = "Quha"
 const SERVER string = "chat.freenode.net:8000"
 const LOG_PATH string = "girkki.log" 
+
+/**
+TODO: Make sure that client actually restarts after an error
+TODO: Add an goroutine to each client that checks if the connection has timed out
+*/
 
 func main() {
 	var wg sync.WaitGroup
@@ -30,5 +34,6 @@ func main() {
 			client.Run()
 		}
 	}()
+	
 	wg.Wait()
 }

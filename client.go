@@ -103,7 +103,7 @@ func (cli *Client) Run() {
 				indexOfColon := strings.Index(result[1:], ":")
 				if indexOfColon != -1 {
 					msg := result[indexOfColon + 2:]
-					cli.logger.Log(receiver + " " + nick + " " + msg)
+					cli.logger.Log(receiver + " " + nick + " " + msg) // Change the logging format to be more clear
 					analyzeCommand(cli, msg)
 				}
 			}
